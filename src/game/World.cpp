@@ -80,6 +80,10 @@ int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_
 int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
+// Movement Anticheat
+bool World::m_EnableMvAnticheat = true;
+uint32 World::m_MvAnticheatGmLevel = 0;
+
 // World constructor
 World::World()
 {
@@ -530,6 +534,10 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.",rate_values[RATE_DURABILITY_LOSS_BLOCK]);
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
+
+    // Movement Anticheat
+    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable", true);
+    m_MvAnticheatGmLevel = sConfig.GetIntDefault("Anticheat.Movement.GmLevel", 0);
 
     // Read other configuration items from the config file
 

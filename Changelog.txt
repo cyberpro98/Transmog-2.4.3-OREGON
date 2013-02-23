@@ -11,6 +11,7 @@
 #                                                                                          #
 ############################################################################################
 
+[4] --> Add AntiCheat.
 [3] --> Project Astranaar + Reset Duel Cooldowns, Hp, Mana and Rage. 
 [2] --> Add Name Admin, GameMaster and Guard Announces. 
 [1] --> Add PvP Ranks.
