@@ -630,7 +630,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "msgadm",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAdminAnnounceCommand,       "", NULL },
         { "msggm",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleGMAnnounceCommand,          "", NULL },
         { "msgguard",       SEC_MODERATOR,      true,  &ChatHandler::HandleGuardAnnounceCommand,       "", NULL },
-        { "gmannounce",     SEC_MODERATOR,      true,  &ChatHandler::HandleGMAnnounceCommand,          "", NULL },
+        { "gmannounce",     SEC_MODERATOR,      true,  &ChatHandler::HandleGameMasterAnnounceCommand,  "", NULL },
         { "notify",         SEC_MODERATOR,      true,  &ChatHandler::HandleNotifyCommand,              "", NULL },
         { "gmnotify",       SEC_MODERATOR,      true,  &ChatHandler::HandleGMNotifyCommand,            "", NULL },
         { "goname",         SEC_MODERATOR,      false, &ChatHandler::HandleGonameCommand,              "", NULL },

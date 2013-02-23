@@ -6684,7 +6684,7 @@ void Player::UpdateZone(uint32 newZone)
     }
 
     pvpInfo.inNoPvPArea = false;
-    if (zone->flags & AREA_FLAG_SANCTUARY || newArea == 415) // in sanctuary
+    if (zone->flags & AREA_FLAG_SANCTUARY || newZone == 331) // in sanctuary
     {
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY);
         pvpInfo.inNoPvPArea = true;
@@ -20880,7 +20880,7 @@ void Player::SetMap(Map * map)
 void Player::UpdateKnownTitles()
 {
     uint32 new_title = 0;
-    uint32 honor_kills = GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
+    uint32 honor_kills = GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
     uint32 old_title = GetUInt32Value(PLAYER_CHOSEN_TITLE);
     RemoveFlag64(PLAYER__FIELD_KNOWN_TITLES,PLAYER_TITLE_MASK_ALL_PVP);
     if(honor_kills == 0)

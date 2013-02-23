@@ -191,7 +191,7 @@ bool ChatHandler::HandleGuardAnnounceCommand(const char* args)
 }
 
 // announce to logged in GMs
-bool ChatHandler::HandleGMAnnounceCommand(const char* args)
+bool ChatHandler::HandleGameMasterAnnounceCommand(const char* args)
 {
     if (!*args)
         return false;

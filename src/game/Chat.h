@@ -122,7 +122,7 @@ class ChatHandler
         bool HandleAdminAnnounceCommand(const char* args);
         bool HandleGMAnnounceCommand(const char* args);
         bool HandleGuardAnnounceCommand(const char* args);
-        bool HandleGMAnnounceCommand(const char* args);
+        bool HandleGameMasterAnnounceCommand(const char* args);
         bool HandleNotifyCommand(const char* args);
         bool HandleGMNotifyCommand(const char* args);
         bool HandleGMmodeCommand(const char* args);

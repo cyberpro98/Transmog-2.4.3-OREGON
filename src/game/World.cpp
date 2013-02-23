@@ -1102,7 +1102,7 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_CHATLOG_BGROUND] = sConfig.GetBoolDefault("ChatLogs.BattleGround", false);
 
     // PvP Ranks
-    setConfig(CONFIG_FLOAT_RATE_PVP_RANK_EXTRA_HONOR,"PvPSystem.Rank.Rate.ExtraHonor = 1",1);
+    m_configs[CONFIG_FLOAT_RATE_PVP_RANK_EXTRA_HONOR] = sConfig.GetIntDefault("PvPSystem.Rank.Rate.ExtraHonor", 1);
     std::string s_pvp_ranks = sConfig.GetStringDefault("PvPSystem.Rank.HKPerRank", "10,50,100,200,450,750,1300,2000,3500,6000,9500,15000,21000,30000");
     char *c_pvp_ranks = const_cast<char*>(s_pvp_ranks.c_str());
     for (int i = 0; i !=HKRANKMAX; i++)
