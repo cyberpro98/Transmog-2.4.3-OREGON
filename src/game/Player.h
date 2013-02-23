@@ -80,6 +80,20 @@ enum BuyBankSlotResult
     ERR_BANKSLOT_OK                 = 3
 };
 
+enum TransmogrificationResult // Transmogrification
+{
+    ERR_FAKE_NEW_BAD_QUALITY,
+    ERR_FAKE_OLD_BAD_QUALITY,
+    ERR_FAKE_SAME_DISPLAY,
+    ERR_FAKE_SAME_DISPLAY_FAKE,
+    ERR_FAKE_CANT_USE,
+    ERR_FAKE_NOT_SAME_CLASS,
+    ERR_FAKE_BAD_CLASS,
+    ERR_FAKE_BAD_SUBLCASS,
+    ERR_FAKE_BAD_INVENTORYTYPE,
+    ERR_FAKE_OK
+};
+
 enum PlayerSpellState
 {
     PLAYERSPELL_UNCHANGED = 0,
@@ -1006,6 +1020,7 @@ class Player : public Unit, public GridObject<Player>
         Item* GetItemByGuid(uint64 guid) const;
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
+        Bag*  GetBagByPos(uint8 slot) const; // Transmogrification
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
         Item* GetShield(bool useable = false) const;
         static uint32 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
@@ -2138,6 +2153,8 @@ class Player : public Unit, public GridObject<Player>
         bool HasTitle(uint32 bitIndex);
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
+
+        uint32 SuitableForTransmogrification(Item* oldItem, Item* newItem); // Transmogrification
 
     protected:
 

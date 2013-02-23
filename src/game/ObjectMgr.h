@@ -528,6 +528,8 @@ class ObjectMgr
         ObjectMgr();
         ~ObjectMgr();
 
+        ItemFakeEntryContainer _itemFakeEntryStore;
+
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
         typedef std::set< Group * > GroupSet;
@@ -755,6 +757,7 @@ class ObjectMgr
         void LoadGameobjectRespawnTimes();
         void LoadItemPrototypes();
         void LoadItemLocales();
+        void LoadTransmogrifications(); // Transmogrification
         void LoadQuestLocales();
         void LoadNpcTextLocales();
         void LoadPageTextLocales();
