@@ -931,6 +931,11 @@ enum BlizzLikeStrings
     LANG_CHATSPY_TOTAL                  = 11607,
     LANG_CHATSPY_ONESPYSANOTHER         = 11608,
 
+    // Admin, GameMaster and Guard Announce
+    LANG_SYSTEMMESSAGE_ADMINISTRATOR    = 12000,
+    LANG_SYSTEMMESSAGE_GAMEMASTER       = 12001,
+    LANG_SYSTEMMESSAGE_GUARD            = 12002,
+
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)
     // For other tables maybe             2000010000-2147483647 (max index)

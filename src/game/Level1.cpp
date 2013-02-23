@@ -160,6 +160,36 @@ bool ChatHandler::HandleAnnounceCommand(const char* args)
     return true;
 }
 
+// Admin Announce
+bool ChatHandler::HandleAdminAnnounceCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    sWorld.SendWorldText(LANG_SYSTEMMESSAGE_ADMINISTRATOR, m_session->GetPlayerName(), args);
+    return true;
+}
+
+// GameMaster Announce
+bool ChatHandler::HandleGMAnnounceCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    sWorld.SendWorldText(LANG_SYSTEMMESSAGE_GAMEMASTER, m_session->GetPlayerName(), args);
+    return true;
+}
+
+// Guard Announce
+bool ChatHandler::HandleGuardAnnounceCommand(const char* args)
+{
+    if (!*args)
+        return false;
+
+    sWorld.SendWorldText(LANG_SYSTEMMESSAGE_GUARD, m_session->GetPlayerName(), args);
+    return true;
+}
+
 // announce to logged in GMs
 bool ChatHandler::HandleGMAnnounceCommand(const char* args)
 {
