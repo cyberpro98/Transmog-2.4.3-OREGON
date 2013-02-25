@@ -16,10 +16,9 @@
  */
 
 /* Script Data Start
-SDName: Gnomeregan
-SDAuthor: Manuel
-SD%Complete: 90%
-SDComment: Some visual effects are not implemented.
+Name: Gnomeregan
+Complete(%): 90%
+Comment: Some visual effects are not implemented.
 Script Data End */
 
 #include "ScriptPCH.h"
