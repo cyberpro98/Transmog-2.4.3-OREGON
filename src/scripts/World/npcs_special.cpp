@@ -24,18 +24,19 @@ EndScriptData
 */
 
 /* ContentData
-npc_lunaclaw_spirit      80%    support for quests 6001/6002 (Body and Heart)
-npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
-npc_dancing_flames      100%    midsummer event NPC
-npc_guardian            100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by BSCR
-npc_garments_of_quests   80%    NPC's related to all Garments of-quests 5621, 5624, 5625, 5648, 5650
-npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
-npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
-npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
-npc_rogue_trainer        80%    Scripted trainers, so they are able to offer item 17126 for class quest 6681
-npc_sayge               100%    Darkmoon event fortune teller, buff player based on answers given
-npc_snake_trap_serpents  80%    AI for snakes that summoned by Snake Trap
-azuregos_magical_ledger 100%    support for quest Azuregos Magical Ledger
+npc_lunaclaw_spirit          80%    support for quests 6001/6002 (Body and Heart)
+npc_chicken_cluck           100%    support for quest 3861 (Cluck!)
+npc_dancing_flames          100%    midsummer event NPC
+npc_guardian                100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by BSCR
+npc_garments_of_quests       80%    NPC's related to all Garments of-quests 5621, 5624, 5625, 5648, 5650
+npc_injured_patient         100%    patients for triage-quests (6622 and 6624)
+npc_doctor                  100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
+npc_mount_vendor            100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
+npc_rogue_trainer            80%    Scripted trainers, so they are able to offer item 17126 for class quest 6681
+npc_sayge                   100%    Darkmoon event fortune teller, buff player based on answers given
+npc_snake_trap_serpents     100%    AI for snakes that summoned by Snake Trap
+azuregos_magical_ledger     100%    support for quest Azuregos Magical Ledger
+npc_force_of_nature_treants 100%    AI for force of nature (druid spell)
 EndContentData */
 
 #include "ScriptPCH.h"
@@ -1281,90 +1282,129 @@ CreatureAI* GetAI_npc_winter_reveler(Creature* pCreature)
     return new npc_winter_revelerAI(pCreature);
 }
 
+/************************************************************/
+
+struct npc_force_of_nature_treantsAI : public ScriptedAI {
+
+    npc_force_of_nature_treantsAI(Creature* c) : ScriptedAI(c) {}
+    
+    Unit* Owner;
+    
+    void Reset() {
+        Owner = me->GetOwner();
+        if(!Owner)
+            return;
+        
+        if(Unit* target = Owner->getAttackerForHelper())
+        {
+            me->SetInCombatWith(target);
+            AttackStart(target);
+        }
+    }
+    
+    void UpdateAI(const uint32 /*diff*/) {
+        
+        if(!Owner)
+            return;
+            
+        if (!me->getVictim())
+        {
+            if (Unit* target = Owner->getAttackerForHelper())
+            {
+                AttackStart(target);
+            }
+            else if (!me->hasUnitState(UNIT_STAT_FOLLOW))
+            {
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveFollow(Owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+            }
+        }
+        
+        DoMeleeAttackIfReady();
+    }
+
+};
+
+CreatureAI* GetAI_npc_force_of_nature_treants(Creature* pCreature)
+{
+    return new npc_force_of_nature_treantsAI(pCreature);
+}
+
 /*####
 ## npc_snake_trap_serpents
 ####*/
 
-enum SnakeTrap
-{
-    SPELL_MIND_NUMBING_POISON     = 25810,	// Viper poison 1
-    SPELL_DEADLY_POISON           = 34655,	// Viper poison 2
-    SPELL_CRIPPLING_POISON        = 30981,	// Viper poison 3
+#define SPELL_MIND_NUMBING_POISON    8692    //Viper
+#define SPELL_DEADLY_POISON          34655   //Venomous Snake
+#define SPELL_CRIPPLING_POISON       3409    //Viper
 
-    NPC_VIPER                     = 19921   // Viper
-};
-
-#define VENOMOUS_SNAKE_TIMER 1500
+#define VENOMOUS_SNAKE_TIMER 1200
 #define VIPER_TIMER 3000
-#define RAND 5
+
+#define C_VIPER 19921
 
 struct npc_snake_trap_serpentsAI : public ScriptedAI
 {
-    npc_snake_trap_serpentsAI(Creature* creature) : ScriptedAI(creature) {}
+    npc_snake_trap_serpentsAI(Creature *c) : ScriptedAI(c), SpellTimer(0) {}
 
     uint32 SpellTimer;
+    Unit *Owner;
     bool IsViper;
 
-    void EnterCombat(Unit* /*who*/) {}
+    void EnterCombat(Unit * /*who*/) {}
 
     void Reset()
     {
-        SpellTimer = 0;
+        Owner = me->GetOwner();
 
-        CreatureInfo const* Info = me->GetCreatureInfo();
+        if (!Owner)
+            return;
 
-        if (Info->Entry == NPC_VIPER)
+        CreatureInfo const *Info = me->GetCreatureInfo();
+
+        if (Info->Entry == C_VIPER)
             IsViper = true;
         else
             IsViper = false;
 
-        me->SetMaxHealth(uint32(107 * (me->getLevel() - 40) * 0.025f));
-        // Add delta to make them not all hit the same time
+        //Add delta to make them not all hit the same time
         uint32 delta = (rand() % 7) * 100;
-        me->SetStatFloatValue(UNIT_FIELD_BASEATTACKTIME, float(Info->baseattacktime + delta));
-        me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , float(Info->attackpower));
+        me->SetStatFloatValue(UNIT_FIELD_BASEATTACKTIME, Info->baseattacktime + delta);
+        me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , Info->attackpower);
 
-        // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-        if (!me->getVictim() && me->isSummon())
-            if (Unit * Owner = CAST_SUM(me)->GetSummoner())
-                if (Owner->getAttackerForHelper())
-                    AttackStart(Owner->getAttackerForHelper());
-    }
-
-    // Redefined for random target selection:
-    void MoveInLineOfSight(Unit *who)
-    {
-        if (!me->getVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
+        if (Unit* attacker = Owner->getAttackerForHelper())
         {
-            if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-                return;
-
-            float attackRadius = me->GetAttackDistance(who);
-            if (me->IsWithinDistInMap(who, attackRadius) && me->IsWithinLOSInMap(who))
-            {
-                if (!(rand() % RAND))
-                {
-                    me->setAttackTimer(BASE_ATTACK, (rand() % 10) * 100);
-                    SpellTimer = (rand() % 10) * 100;
-                    AttackStart(who);
-                }
-            }
-        }
+            me->SetInCombatWith(attacker);
+            AttackStart(attacker);
+        }   
     }
 
     void UpdateAI(const uint32 diff)
     {
-        if (!UpdateVictim())
+        if (!Owner)
             return;
+
+        if (!me->getVictim())
+        {
+            if (Owner->getAttackerForHelper())
+            {
+                AttackStart(Owner->getAttackerForHelper());
+            }
+            else if (!me->hasUnitState(UNIT_STAT_FOLLOW))
+            {
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveFollow(Owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+            }
+        }
 
         if (SpellTimer <= diff)
         {
-            if (IsViper) // Viper
+            if (IsViper) //Viper
             {
-                if (urand(0, 2) == 0) // 33% chance to cast
+                if (urand(0,2) == 0) //33% chance to cast
                 {
                     uint32 spell;
-                    if (urand(0, 1) == 0)
+                    if (urand(0,1) == 0)
                         spell = SPELL_MIND_NUMBING_POISON;
                     else
                         spell = SPELL_CRIPPLING_POISON;
@@ -1374,15 +1414,16 @@ struct npc_snake_trap_serpentsAI : public ScriptedAI
 
                 SpellTimer = VIPER_TIMER;
             }
-            else // Venomous Snake
+            else //Venomous Snake
             {
-                if (urand(0, 2) == 0) // 33% chance to cast
+                if (rand() % 10 < 8) //80% chance to cast
                     DoCast(me->getVictim(), SPELL_DEADLY_POISON);
                 SpellTimer = VENOMOUS_SNAKE_TIMER + (rand() %5)*100;
             }
         } else SpellTimer -= diff;
+        
         DoMeleeAttackIfReady();
-    }
+     }
 };
 
 CreatureAI* GetAI_npc_snake_trap_serpents(Creature* pCreature)
@@ -1828,6 +1869,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_brewfest_reveler";
     newscript->GetAI = &GetAI_npc_winter_reveler;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_force_of_nature_treants";
+    newscript->GetAI = &GetAI_npc_force_of_nature_treants;
     newscript->RegisterSelf();
 
     newscript = new Script;
