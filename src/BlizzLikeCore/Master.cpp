@@ -37,7 +37,7 @@
 
 // Format is BDB_YYYYMMDD
 #ifndef _REQ_BDB_VERSION
-# define _REQ_BDB_VERSION  "BDB_20130227"
+# define _REQ_BDB_VERSION  "BDB_20130304"
 #endif //_REQ_BDB_VERSION
 
 #ifdef _WIN32
@@ -105,9 +105,9 @@ Master::~Master()
 // Main function
 int Master::Run()
 {
-    sLog.outString("************************************************************************");
-    sLog.outString("%s(world) Rev: %s Hash: %s", _PACKAGENAME, _REVISION, _HASH);
-    sLog.outString("************************************************************************");
+    sLog.outString("**************************************************************************");
+    sLog.outString(" %s(world) Rev: %s Hash: %s ", _PACKAGENAME, _REVISION, _HASH);
+    sLog.outString("**************************************************************************");
     sLog.outString("<Ctrl-C> to stop.");
     sLog.outString(" ");
 

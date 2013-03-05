@@ -728,8 +728,8 @@ ChatCommand * ChatHandler::getCommandTable()
                         for (uint32 j = 0; ptable[j].Name != NULL; j++)
                         {
                             // first case for "" named subcommand
-                            if (ptable[j].Name[0] == '\0' && name == commandTable[i].Name ||
-                                name == fmtstring("%s %s", commandTable[i].Name, ptable[j].Name))
+                            if ((ptable[j].Name[0] == '\0' && name == commandTable[i].Name) ||
+                                (name == fmtstring("%s %s", commandTable[i].Name, ptable[j].Name)))
                             {
                                 ptable[j].SecurityLevel = (uint16)fields[1].GetUInt16();
                                 ptable[j].Help = fields[2].GetCppString();
@@ -1023,11 +1023,11 @@ valid examples:
     std::istringstream reader(message);
     char buffer[256];
 
-    uint32 color;
+    uint32 color = 0;
 
     ItemPrototype const* linkedItem;
     Quest const* linkedQuest;
-    SpellEntry const *linkedSpell;
+    SpellEntry const *linkedSpell = NULL;
 
     while (!reader.eof())
     {
@@ -1155,7 +1155,7 @@ valid examples:
                     char c = reader.peek();
 
                     // ignore enchants etc.
-                    while (c >='0' && c <='9' || c == ':')
+                    while ((c >='0' && c <='9') || c == ':')
                     {
                         reader.ignore(1);
                         c = reader.peek();
@@ -1514,7 +1514,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
 }
 
 //Note: target_guid used only in CHAT_MSG_WHISPER_INFORM mode (in this case channelName ignored)
-void ChatHandler::FillMessageData(WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, uint64 target_guid, const char *message, Unit *speaker)
+void ChatHandler::FillMessageData(WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, uint64 target_guid, const char *message, Unit* speaker)
 {
     uint32 messageLength = (message ? strlen(message) : 0) + 1;
 
@@ -1729,12 +1729,12 @@ char* ChatHandler::extractKeyFromLink(char* text, char const* const* linkTypes, 
 
 char const *fmtstring(char const *format, ...)
 {
-    va_list        argptr;
-    #define    MAX_FMT_STRING    32000
-    static char        temp_buffer[MAX_FMT_STRING];
-    static char        string[MAX_FMT_STRING];
-    static int        index = 0;
-    char    *buf;
+    va_list      argptr;
+    #define      MAX_FMT_STRING    32000
+    static char  temp_buffer[MAX_FMT_STRING];
+    static char  string[MAX_FMT_STRING];
+    static int   index = 0;
+    char *buf;
     int len;
 
     va_start(argptr, format);

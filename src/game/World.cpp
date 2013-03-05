@@ -917,6 +917,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_DEATH_BONES_WORLD]              = sConfig.GetBoolDefault("Death.Bones.World", true);
     m_configs[CONFIG_DEATH_BONES_BG_OR_ARENA]        = sConfig.GetBoolDefault("Death.Bones.BattlegroundOrArena", true);
 
+    m_configs[CONFIG_DIE_COMMAND_MODE] = sConfig.GetBoolDefault("Die.Command.Mode", true);
+
     m_configs[CONFIG_THREAT_RADIUS] = sConfig.GetIntDefault("ThreatRadius", 60);
 
     // always use declined names in the russian client
@@ -1558,7 +1560,7 @@ void World::SetInitialWorldSettings()
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
 
-    sLog.outString("WORLD: World initialized");
+    sLog.outString("WorldServer started");
 }
 
 void World::DetectDBCLang()
@@ -2287,8 +2289,8 @@ void World::UpdateSessions(time_t diff)
         next = itr;
         ++next;
 
-        if (!itr->second)
-            continue;
+      //if (!itr->second) // UpdateSessions will never get NULL at this point.
+      //    continue;
 
         // and remove not active sessions from the list
         if (!itr->second->Update(diff))                      // As interval = 0
