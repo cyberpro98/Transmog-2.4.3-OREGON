@@ -865,7 +865,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
     GetPlayer()->m_anti_lastspeed_changetime = movementInfo.time + 1750;
 }
 
-void WorldSession::HandleMoveFlyModeChangeAckOpcode(WorldPacket& recv_data)
+void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 {
     // fly mode on/off
     DEBUG_LOG("WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
