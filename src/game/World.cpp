@@ -1162,9 +1162,10 @@ void World::SetInitialWorldSettings()
     //No SQL injection as values are treated as integers
 
     // not send custom type REALM_FFA_PVP to realm list
-    uint32 server_type = IsFFAPvPRealm() ? REALM_TYPE_PVP : getConfig(CONFIG_GAME_TYPE);
+    uint32 server_type = IsFFAPvPRealm() ? uint32(REALM_TYPE_PVP) : getConfig(CONFIG_GAME_TYPE);
     uint32 realm_zone = getConfig(CONFIG_REALM_ZONE);
-    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realmID);
+
+    LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realmID);      // One-time query
 
     // Remove the bones (they should not exist in DB though) and old corpses after a restart
     CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0' OR time < (UNIX_TIMESTAMP()-'%u')", 3 * DAY);
