@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011-2013 BlizzLikeCore <http://blizzlike.servegame.com/>
- * Please, read the credits file.
+ * Copyright (C) 2011-2013 BlizzLikeGroup <http://blizzlike.servegame.com/>
+ * Please, look at the CREDITS.md file.
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
@@ -947,6 +947,26 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 17009:                                 // Voodoo
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 spell_id = 0;
+                    switch (urand(0, 6))
+                    {
+                        case 0: spell_id = 16707; break;    // Hex
+                        case 1: spell_id = 16708; break;    // Hex
+                        case 2: spell_id = 16709; break;    // Hex
+                        case 3: spell_id = 16711; break;    // Grow
+                        case 4: spell_id = 16712; break;    // Special Brew
+                        case 5: spell_id = 16713; break;    // Ghostly
+                        case 6: spell_id = 16716; break;    // Launch
+                    }
+
+                    m_caster->CastSpell(unitTarget, spell_id, true, NULL, NULL, m_originalCasterGUID);
+                    return;
+                }
                 case 17251:                                 // Spirit Healer Res
                 {
                     if (!unitTarget || !m_originalCaster)
@@ -965,7 +985,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    uint32 spell_id = roll_chance_i(50)
+                    uint32 spell_id = urand(0, 1)
                         ? 17269                             // Create Resonating Skull
                         : 17270;                            // Create Bone Dust
 
