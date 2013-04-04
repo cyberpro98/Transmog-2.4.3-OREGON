@@ -32,7 +32,7 @@
 #include "ObjectAccessor.h"
 #include "MapManager.h"
 
-void WorldSession::SendNameQueryOpcode(Player *p)
+void WorldSession::SendNameQueryOpcode(Player* p)
 {
     if (!p)
         return;
@@ -120,7 +120,7 @@ void WorldSession::HandleNameQueryOpcode(WorldPacket& recv_data)
 
     recv_data >> guid;
 
-    Player *pChar = ObjectAccessor::FindPlayer(guid);
+    Player* pChar = ObjectAccessor::FindPlayer(guid);
 
     if (pChar)
         SendNameQueryOpcode(pChar);
@@ -258,7 +258,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
 {
     sLog.outDetail("WORLD: Received MSG_CORPSE_QUERY");
 
-    Corpse *corpse = GetPlayer()->GetCorpse();
+    Corpse* corpse = GetPlayer()->GetCorpse();
 
     if (!corpse)
     {

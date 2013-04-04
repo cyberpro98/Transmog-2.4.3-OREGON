@@ -41,7 +41,7 @@ float SpawnPointSpecial[3][3]=
 {
     {5497.08f,    -2493.23f,    1535.72f}, //spawn point for the gargoyles near the horde gate
     {5624.53f,    -2548.12f,    1551.54f}, //spawn point for the frost wyrm near the horde gate
-    {5604.41f,   -2811.98f,   1547.77f}  //spawn point for the gargoyles and wyrms near the horde tower
+    {5604.41f,    -2811.98f,    1547.77f}  //spawn point for the gargoyles and wyrms near the horde tower
 };
 
 // Locations for summoning waves in Alliance base
@@ -309,7 +309,7 @@ float HordeFirePos[65][8]=//spawn points for the fire visuals (GO) in the horde 
     {5545.43f,    -2647.82f,    1483.05f,    5.38848f,    0,    0,    0.432578f,    -0.901596f}
 };
 
-hyjalAI::hyjalAI(Creature *c) : npc_escortAI(c), Summons(me)
+hyjalAI::hyjalAI(Creature* c) : npc_escortAI(c), Summons(me)
 {
     pInstance = c->GetInstanceData();
     VeinsSpawned[0] = false;
@@ -331,7 +331,7 @@ hyjalAI::hyjalAI(Creature *c) : npc_escortAI(c), Summons(me)
     DoMassTeleport = false;
 }
 
-void hyjalAI::JustSummoned(Creature *summoned)
+void hyjalAI::JustSummoned(Creature* summoned)
 {
     Summons.Summon(summoned);
 }
@@ -525,7 +525,7 @@ void hyjalAI::SummonCreature(uint32 entry, float Base[4][3])
     }
 }
 
-void hyjalAI::SummonNextWave(Wave wave[18], uint32 Count, float Base[4][3])
+void hyjalAI::SummonNextWave(const Wave wave[18], uint32 Count, float Base[4][3])
 {
     // 1 in 4 chance we give a rally yell. Not sure if the chance is offilike.
     if (rand()%4 == 0)
@@ -919,6 +919,7 @@ void hyjalAI::UpdateAI(const uint32 diff)
 
     DoMeleeAttackIfReady();
 }
+
 void hyjalAI::JustDied(Unit* /*killer*/)
 {
     if (IsDummy)return;
@@ -941,6 +942,7 @@ void hyjalAI::JustDied(Unit* /*killer*/)
         pInstance->SetData(DATA_RESET_RAIDDAMAGE, 0);//reset damage on die
     }
 }
+
 void hyjalAI::HideNearPos(float x, float y)
 {
     CellPair pair(BlizzLike::ComputeCellPair(x, y));
@@ -968,6 +970,7 @@ void hyjalAI::HideNearPos(float x, float y)
         }
     }
 }
+
 void hyjalAI::RespawnNearPos(float x, float y)
 {
     CellPair p(BlizzLike::ComputeCellPair(x, y));
@@ -980,6 +983,7 @@ void hyjalAI::RespawnNearPos(float x, float y)
     TypeContainerVisitor<BlizzLike::WorldObjectWorker<BlizzLike::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
     cell.Visit(p, obj_worker, *me->GetMap());
 }
+
 void hyjalAI::WaypointReached(uint32 i)
 {
     if (i == 1 || (i == 0 && me->GetEntry() == THRALL))
@@ -1036,6 +1040,7 @@ void hyjalAI::WaypointReached(uint32 i)
         }
     }
 }
+
 void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
 {
     npc_escortAI::UpdateAI(diff);

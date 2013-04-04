@@ -1097,7 +1097,7 @@ class Unit : public WorldObject
         void CastCustomSpell(uint32 spellId, SpellValueMod mod, uint32 value, Unit* Victim = NULL, bool triggered = true, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
         void CastCustomSpell(uint32 spellId, CustomSpellValues const &value, Unit* Victim = NULL, bool triggered = true, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
         void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
-        void CastSpell(GameObject *go, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
+        void CastSpell(GameObject* go, uint32 spellId, bool triggered, Item *castItem = NULL, Aura* triggeredByAura = NULL, uint64 originalCaster = 0);
         void AddAura(uint32 spellId, Unit* target);
 
         bool IsDamageToThreatSpell(SpellEntry const * spellInfo) const;
@@ -1117,13 +1117,13 @@ class Unit : public WorldObject
 
         void SendMonsterStop();
         void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 Time, Player* player = NULL);
-        void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 MoveFlags, uint32 time, float speedZ, Player *player = NULL);
+        void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 MoveFlags, uint32 time, float speedZ, Player* player = NULL);
         void SendMonsterMoveByPath(Path const& path, uint32 start, uint32 end);
         void SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTime = 0, Player* player = NULL);
         void SendMonsterMoveWithSpeedToCurrentDestination(Player* player = NULL);
         void SendMovementFlagUpdate();
 
-        void BuildHeartBeatMsg(WorldPacket *data) const;
+        void BuildHeartBeatMsg(WorldPacket* data) const;
 
         virtual void MoveOutOfRange(Player &) {  };
 
@@ -1408,8 +1408,8 @@ class Unit : public WorldObject
         void RemoveGameObject(GameObject* gameObj, bool del);
         void RemoveGameObject(uint32 spellid, bool del);
         void RemoveAllGameObjects();
-        DynamicObject *GetDynObject(uint32 spellId, uint32 effIndex);
-        DynamicObject *GetDynObject(uint32 spellId);
+        DynamicObject* GetDynObject(uint32 spellId, uint32 effIndex);
+        DynamicObject* GetDynObject(uint32 spellId);
         uint32 CalculateDamage(WeaponAttackType attType, bool normalized);
         float GetAPMultiplier(WeaponAttackType attType, bool normalized);
         void ModifyAuraState(AuraState flag, bool apply);
@@ -1428,7 +1428,7 @@ class Unit : public WorldObject
         void SetLastManaUse(uint32 spellCastTime) { m_lastManaUse = spellCastTime; }
         bool IsUnderLastManaUseEffect() const;
 
-        void SetContestedPvP(Player *attackedPlayer = NULL);
+        void SetContestedPvP(Player* attackedPlayer = NULL);
 
         void MeleeDamageBonus(Unit* pVictim, uint32 *damage, WeaponAttackType attType, SpellEntry const *spellProto = NULL);
         uint32 GetCastingTimeForBonus(SpellEntry const *spellProto, DamageEffectType damagetype, uint32 CastingTime);

@@ -82,7 +82,7 @@ struct instance_deadmines : public ScriptedInstance
         if (!IronCladDoorGUID || !DefiasCannonGUID || !DoorLeverGUID)
             return;
 
-        GameObject *pIronCladDoor = instance->GetGameObject(IronCladDoorGUID);
+        GameObject* pIronCladDoor = instance->GetGameObject(IronCladDoorGUID);
         if (!pIronCladDoor)
             return;
 
@@ -121,11 +121,11 @@ struct instance_deadmines : public ScriptedInstance
 
     void SummonCreatures()
     {
-        if (GameObject *pIronCladDoor = instance->GetGameObject(IronCladDoorGUID))
+        if (GameObject* pIronCladDoor = instance->GetGameObject(IronCladDoorGUID))
         {
-            Creature *DefiasPirate1 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() - 2,pIronCladDoor->GetPositionY()-7,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-            Creature *DefiasPirate2 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() + 3,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-            Creature *DefiasCompanion = pIronCladDoor->SummonCreature(3450,pIronCladDoor->GetPositionX() + 2,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+            Creature* DefiasPirate1 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() - 2,pIronCladDoor->GetPositionY()-7,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+            Creature* DefiasPirate2 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() + 3,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+            Creature* DefiasCompanion = pIronCladDoor->SummonCreature(3450,pIronCladDoor->GetPositionX() + 2,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
 
             DefiasPirate1GUID = DefiasPirate1->GetGUID();
             DefiasPirate2GUID = DefiasPirate2->GetGUID();
@@ -138,9 +138,9 @@ struct instance_deadmines : public ScriptedInstance
         if (!DefiasPirate1GUID || !DefiasPirate2GUID || !DefiasCompanionGUID)
             return;
 
-        Creature *pDefiasPirate1 = instance->GetCreature(DefiasPirate1GUID);
-        Creature *pDefiasPirate2 = instance->GetCreature(DefiasPirate2GUID);
-        Creature *pDefiasCompanion = instance->GetCreature(DefiasCompanionGUID);
+        Creature* pDefiasPirate1 = instance->GetCreature(DefiasPirate1GUID);
+        Creature* pDefiasPirate2 = instance->GetCreature(DefiasPirate2GUID);
+        Creature* pDefiasCompanion = instance->GetCreature(DefiasCompanionGUID);
         if (!pDefiasPirate1 || !pDefiasPirate2 || !pDefiasCompanion)
             return;
 
@@ -157,7 +157,7 @@ struct instance_deadmines : public ScriptedInstance
 
     void ShootCannon()
     {
-        if (GameObject *pDefiasCannon = instance->GetGameObject(DefiasCannonGUID))
+        if (GameObject* pDefiasCannon = instance->GetGameObject(DefiasCannonGUID))
         {
             pDefiasCannon->SetGoState(GO_STATE_ACTIVE);
             DoPlaySound(pDefiasCannon, SOUND_CANNONFIRE);
@@ -166,7 +166,7 @@ struct instance_deadmines : public ScriptedInstance
 
     void BlastOutDoor()
     {
-        if (GameObject *pIronCladDoor = instance->GetGameObject(IronCladDoorGUID))
+        if (GameObject* pIronCladDoor = instance->GetGameObject(IronCladDoorGUID))
         {
             pIronCladDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             DoPlaySound(pIronCladDoor, SOUND_DESTROYDOOR);
@@ -175,7 +175,7 @@ struct instance_deadmines : public ScriptedInstance
 
     void LeverStucked()
     {
-        if (GameObject *pDoorLever = instance->GetGameObject(DoorLeverGUID))
+        if (GameObject* pDoorLever = instance->GetGameObject(DoorLeverGUID))
             pDoorLever->SetUInt32Value(GAMEOBJECT_FLAGS, 4);
     }
 

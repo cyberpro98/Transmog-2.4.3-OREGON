@@ -399,7 +399,7 @@ bool ChatHandler::HandleGMTicketGetByIdCommand(const char* args)
     }
 
     ticket->viewed = true;
-    Player *plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
     if (plr && plr->IsInWorld())
     {
         // tell client to update display of ticket status
@@ -441,7 +441,7 @@ bool ChatHandler::HandleGMTicketGetByNameCommand(const char* args)
     }
 
     ticket->viewed = true;
-    Player *plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
     if (plr && plr->IsInWorld())
     {
         // tell client to update display of ticket status
@@ -492,7 +492,7 @@ bool ChatHandler::HandleGMTicketCloseByIdCommand(const char* args)
     ss << PGetParseString(LANG_COMMAND_TICKETLISTNAME, ticket->name.c_str());
     ss << PGetParseString(LANG_COMMAND_TICKETCLOSED, m_session->GetPlayer()->GetName());
     SendGlobalGMSysMessage(ss.str().c_str());
-    Player *plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
     ticketmgr.RemoveGMTicket(ticket->guid, m_session->GetPlayer()->GetGUID());
 
     if (!plr || !plr->IsInWorld())
@@ -532,7 +532,7 @@ bool ChatHandler::HandleGMTicketAssignToCommand(const char* args)
     if (!normalizePlayerName(targm))
         return false;
 
-    Player *cplr = m_session->GetPlayer();
+    Player* cplr = m_session->GetPlayer();
     GM_Ticket *ticket = ticketmgr.GetGMTicket(ticketGuid);
 
     if (!ticket || ticket->closed != 0)
@@ -566,7 +566,7 @@ bool ChatHandler::HandleGMTicketAssignToCommand(const char* args)
     }
 
     ticket->escalated = true;
-    Player *plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
     if (plr && plr->IsInWorld())
     {
         // tell client to update display of ticket status
@@ -591,7 +591,7 @@ bool ChatHandler::HandleGMTicketUnAssignCommand(const char* args)
         return false;
 
     uint64 ticketGuid = atoi(args);
-    Player *cplr = m_session->GetPlayer();
+    Player* cplr = m_session->GetPlayer();
     GM_Ticket *ticket = ticketmgr.GetGMTicket(ticketGuid);
 
     if (!ticket|| ticket->closed != 0)
@@ -607,7 +607,7 @@ bool ChatHandler::HandleGMTicketUnAssignCommand(const char* args)
 
     std::string gmname;
     objmgr.GetPlayerNameByGUID(ticket->assignedToGM, gmname);
-    Player *plr = ObjectAccessor::FindPlayer(ticket->assignedToGM);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->assignedToGM);
     if (plr && plr->IsInWorld() && plr->GetSession()->GetSecurity() > cplr->GetSession()->GetSecurity())
     {
         SendSysMessage(LANG_COMMAND_TICKETUNASSIGNSECURITY);
@@ -622,7 +622,7 @@ bool ChatHandler::HandleGMTicketUnAssignCommand(const char* args)
     SendGlobalGMSysMessage(ss.str().c_str());
 
     ticket->escalated = false;
-    Player *player = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* player = ObjectAccessor::FindPlayer(ticket->playerGuid);
     if (player && player->IsInWorld())
     {
         // tell client to update display of ticket status
@@ -648,7 +648,7 @@ bool ChatHandler::HandleGMTicketCommentCommand(const char* args)
     if (!comment)
         return false;
 
-    Player *cplr = m_session->GetPlayer();
+    Player* cplr = m_session->GetPlayer();
     GM_Ticket *ticket = ticketmgr.GetGMTicket(ticketGuid);
 
     if (!ticket || ticket->closed != 0)
@@ -701,7 +701,7 @@ bool ChatHandler::HandleGMTicketDeleteByIdCommand(const char* args)
     ss << PGetParseString(LANG_COMMAND_TICKETLISTNAME, ticket->name.c_str());
     ss << PGetParseString(LANG_COMMAND_TICKETDELETED, m_session->GetPlayer()->GetName());
     SendGlobalGMSysMessage(ss.str().c_str());
-    Player *plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
+    Player* plr = ObjectAccessor::FindPlayer(ticket->playerGuid);
     ticketmgr.DeleteGMTicketPermanently(ticket->guid);
     if (plr && plr->IsInWorld())
     {
@@ -858,7 +858,7 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
         return false;
     }
 
-    Player *target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
+    Player* target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
     if (target)
     {
         if (target->IsBeingTeleported())
@@ -974,7 +974,7 @@ bool ChatHandler::HandleGonameCommand(const char* args)
         return false;
     }
 
-    Player *target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
+    Player* target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
     if (target)
     {
         Map* cMap = target->GetMap();
@@ -1164,7 +1164,7 @@ bool ChatHandler::HandleModifyHPCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1208,7 +1208,7 @@ bool ChatHandler::HandleModifyManaCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1253,7 +1253,7 @@ bool ChatHandler::HandleModifyEnergyCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1300,7 +1300,7 @@ bool ChatHandler::HandleModifyRageCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1424,7 +1424,7 @@ bool ChatHandler::HandleModifySpellCommand(const char* args)
     else
         mark = atoi(pmark);
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1480,7 +1480,7 @@ bool ChatHandler::HandleTaxiCheatCommand(const char* args)
 
     std::string argstr = (char*)args;
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (!target)
     {
         target=m_session->GetPlayer();
@@ -1526,7 +1526,7 @@ bool ChatHandler::HandleModifyASpeedCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1568,7 +1568,7 @@ bool ChatHandler::HandleModifySpeedCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1607,7 +1607,7 @@ bool ChatHandler::HandleModifySwimCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1646,7 +1646,7 @@ bool ChatHandler::HandleModifyBWalkCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1685,7 +1685,7 @@ bool ChatHandler::HandleModifyFlyCommand(const char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1962,7 +1962,7 @@ bool ChatHandler::HandleModifyMountCommand(const char* args)
             return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1999,7 +1999,7 @@ bool ChatHandler::HandleModifyMoneyCommand(const char* args)
     if (!*args)
         return false;
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (target == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -2051,7 +2051,7 @@ bool ChatHandler::HandleModifyBitCommand(const char* args)
     if (!*args)
         return false;
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -2101,7 +2101,7 @@ bool ChatHandler::HandleModifyHonorCommand (const char* args)
     if (!*args)
         return false;
 
-    Player *target = getSelectedPlayer();
+    Player* target = getSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2385,7 +2385,7 @@ bool ChatHandler::HandleSendMailCommand(const char* args)
 
     uint32 itemTextId = !text.empty() ? objmgr.CreateItemText(text) : 0;
 
-    Player *receiver = ObjectAccessor::FindPlayer(receiver_guid);
+    Player* receiver = ObjectAccessor::FindPlayer(receiver_guid);
 
     MailDraft(subject, itemTextId)
         .SendMailTo(MailReceiver(receiver,GUID_LOPART(receiver_guid)),sender);
@@ -2435,7 +2435,7 @@ bool ChatHandler::HandleNameTeleCommand(const char * args)
         return false;
     }
 
-    Player *target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
+    Player* target = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
     if (target)
     {
         if (target->IsBeingTeleported())
@@ -2479,7 +2479,7 @@ bool ChatHandler::HandleGroupTeleCommand(const char * args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player* player = getSelectedPlayer();
     if (!player)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -2513,7 +2513,7 @@ bool ChatHandler::HandleGroupTeleCommand(const char * args)
 
     for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
     {
-        Player *pl = itr->getSource();
+        Player* pl = itr->getSource();
 
         if (!pl || !pl->GetSession())
             continue;
@@ -2559,7 +2559,7 @@ bool ChatHandler::HandleGroupgoCommand(const char* args)
         return false;
     }
 
-    Player *player = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
+    Player* player = ObjectAccessor::Instance().FindPlayerByName(name.c_str());
     if (!player)
     {
         PSendSysMessage(LANG_NO_PLAYER, args);
@@ -2592,7 +2592,7 @@ bool ChatHandler::HandleGroupgoCommand(const char* args)
 
     for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
     {
-        Player *pl = itr->getSource();
+        Player* pl = itr->getSource();
 
         if (!pl || pl == m_session->GetPlayer() || !pl->GetSession())
             continue;

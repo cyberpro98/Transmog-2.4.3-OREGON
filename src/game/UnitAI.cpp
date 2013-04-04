@@ -104,7 +104,7 @@ inline bool SelectTargetHelper(const Unit* me, const Unit* target, const bool &p
     return true;
 }
 
-struct TargetDistanceOrder : public std::binary_function<const Unit* , const Unit* , bool>
+struct TargetDistanceOrder : public std::binary_function<const Unit*, const Unit*, bool>
 {
     const Unit* me;
     TargetDistanceOrder(const Unit* Target) : me(Target) {};
@@ -295,7 +295,7 @@ void PlayerAI::OnCharmed(bool apply) { me->IsAIEnabled = apply; }
 
 void SimpleCharmedAI::UpdateAI(const uint32 /*diff*/)
 {
-    Creature *charmer = me->GetCharmer()->ToCreature();
+    Creature* charmer = me->GetCharmer()->ToCreature();
 
     //kill self if charm aura has infinite duration
     if (charmer->IsInEvadeMode())

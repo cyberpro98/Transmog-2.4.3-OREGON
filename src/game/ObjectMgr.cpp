@@ -1156,7 +1156,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 artKit, uint32 mapId, float x, 
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsLoaded(x, y))
     {
-        GameObject *go = new GameObject;
+        GameObject* go = new GameObject;
         if (!go->LoadFromDB(guid, map))
         {
             sLog.outError("AddGOData: cannot add gameobject entry %u to map", entry);
@@ -4564,7 +4564,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->checked = fields[8].GetUInt32();
         m->mailTemplateId = fields[9].GetInt16();
 
-        Player *pl = 0;
+        Player* pl = 0;
         if (serverUp)
             pl = ObjectAccessor::FindPlayer((uint64)m->receiver);
         if (pl && pl->m_mailsLoaded)
@@ -5941,7 +5941,7 @@ void ObjectMgr::LoadCorpses()
 
         uint32 guid = fields[15].GetUInt32();
 
-        Corpse *corpse = new Corpse;
+        Corpse* corpse = new Corpse;
         if (!corpse->LoadFromDB(guid, fields))
         {
             delete corpse;

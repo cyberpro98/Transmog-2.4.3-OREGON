@@ -51,7 +51,7 @@ enum
 # at_twilight_grove
 ######*/
 
-bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry * /*at*/)
+bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry* /*at*/)
 {
     if (pPlayer->HasQuestForItem(21149))
     {
@@ -82,7 +82,7 @@ bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry * /*a
 
 struct boss_twilight_corrupterAI : public ScriptedAI
 {
-    boss_twilight_corrupterAI(Creature *c) : ScriptedAI(c) {}
+    boss_twilight_corrupterAI(Creature* c) : ScriptedAI(c) {}
 
     uint32 SoulCorruption_Timer;
     uint32 CreatureOfNightmare_Timer;

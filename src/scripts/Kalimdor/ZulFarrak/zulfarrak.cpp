@@ -43,7 +43,7 @@ EndContentData */
 
 struct npc_sergeant_blyAI : public ScriptedAI
 {
-    npc_sergeant_blyAI(Creature *c) : ScriptedAI(c)
+    npc_sergeant_blyAI(Creature* c) : ScriptedAI(c)
     {
         //pInstance = c->GetInstanceData();
     }
@@ -140,7 +140,7 @@ bool GossipSelect_npc_sergeant_bly(Player* pPlayer, Creature* pCreature, uint32 
 
 struct npc_weegli_blastfuseAI : public ScriptedAI
 {
-    npc_weegli_blastfuseAI(Creature *c) : ScriptedAI(c)
+    npc_weegli_blastfuseAI(Creature* c) : ScriptedAI(c)
     {
         //pInstance = c->GetInstanceData();
     }
@@ -238,7 +238,7 @@ enum {
     ZUMRAH_HOSTILE_FACTION = 37
 };
 
-bool AreaTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry * /*at*/)
+bool AreaTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry* /*at*/)
 {
     Creature* Zumrah = pPlayer->FindNearestCreature(ZUMRAH_ID, 30.0f);
 
