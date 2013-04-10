@@ -1,18 +1,5 @@
 /*
- * Copyright (C) 2011-2013 BlizzLikeGroup <http://blizzlike.servegame.com/>
- * Please, look at the CREDITS.md file.
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * BlizzLikeCore integrates as part of this file: CREDITS.md and LICENSE.md
  */
 
 #include "Common.h"
@@ -1409,11 +1396,14 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
                 case 42631:                                 // Fire Bomb (explode)
                 {
-                    if (!unitTarget)
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
                     unitTarget->RemoveAurasDueToSpell(42629);
                     unitTarget->CastSpell(unitTarget, 42630, true);
+
+                    // despawn the bomb after exploding
+                    ((Creature*)unitTarget)->ForcedDespawn(3000);
                     return;
                 }
                 case 43096:                                 // Summon All Players
@@ -1517,6 +1507,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
                 case 44997:                                 // Converting Sentry
                 {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    Creature* creatureTarget = (Creature*)unitTarget;
+
+                    creatureTarget->ForcedDespawn();
+
                     //Converted Sentry Credit
                     m_caster->CastSpell(m_caster, 45009, true);
                     return;
