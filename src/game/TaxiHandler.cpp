@@ -209,7 +209,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     if (curDestNode && curDestNode->map_id == GetPlayer()->GetMapId())
     {
         while(GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
-            GetPlayer()->GetMotionMaster()->MovementExpired(false);
+              GetPlayer()->GetMotionMaster()->MovementExpired(false);
     }
 
     // Movement Anticheat
@@ -227,7 +227,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
             FlightPathMovementGenerator* flight = (FlightPathMovementGenerator*)(GetPlayer()->GetMotionMaster()->top());
 
             flight->SetCurrentNodeAfterTeleport();
-            Path::PathNode const& node = flight->GetPath()[flight->GetCurrentNode()];
+            TaxiPathNodeEntry const& node = flight->GetPath()[flight->GetCurrentNode()];
             flight->SkipCurrentNode();
 
             GetPlayer()->TeleportTo(curDestNode->map_id,node.x,node.y,node.z,GetPlayer()->GetOrientation());
