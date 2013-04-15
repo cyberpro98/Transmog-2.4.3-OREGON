@@ -11,7 +11,7 @@ echo.
 echo.
 echo.
 md mmaps
-MoveMapGen.exe --silent --offMeshInput offmesh.txt
+movements_extractor.exe --silent --offMeshInput offmesh.txt
 cls
 echo.
 echo.

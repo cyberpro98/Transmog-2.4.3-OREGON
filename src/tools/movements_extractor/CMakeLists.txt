@@ -41,9 +41,9 @@ target_link_libraries(movements_extractor
   g3dlib
   Recast
   Detour
-  blizzlikeframework
+#  blizzlikeframework
   ${MYSQL_LIBRARY}
-  ${ACE_LIBRARY}
+#  ${ACE_LIBRARY}
   ${BZIP2_LIBRARIES}
   ${ZLIB_LIBRARIES}
 )
