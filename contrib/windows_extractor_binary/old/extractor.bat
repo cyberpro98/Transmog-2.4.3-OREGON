@@ -1,6 +1,6 @@
 @echo off
-color 0b
 :panel
+color 0b
 cls
 echo.
 echo ////////////////////////////////////////////////////
@@ -20,60 +20,48 @@ if "%opc%" == "3" goto 3_extract_mmaps
 if "%opc%" == "0" goto exit
 goto panel
 :1_extract_dbc_maps
+if exist dbc (del /S /Q dbc)
+if exist maps (del /S /Q maps)
 map_extractor.exe
 if %ERRORLEVEL% == 0 (cls
 echo.
 echo.
 echo Process done! 
-echo Copy dbc/maps folders to the core main directory.
 echo Press any key to panel . . .
 pause>nul
 goto panel)
 echo.
 echo.
+color 0c
 echo Process finalized with errors.
 echo Press any key to panel . . .
 pause>nul
 goto panel
 :2_extract_vmaps
-if exist buildings (cls
-echo.
-echo.
-echo The buildings folder already exist do you want to delete it?
-echo if YES hit Enter to continue if no CLOSE the program now! . . .
-pause>nul
-DEL /S /Q buildings)
+if exist buildings (del /S /Q buildings)
 vmap_extractor.exe
-md vmaps
+if exist vmaps (del /S /Q vmaps)
+if not exist vmaps (md vmaps)
 vmap_assembler.exe buildings vmaps
 if %ERRORLEVEL% == 0 (cls
 echo.
 echo.
 echo Process done! 
-echo Copy vmaps folder to the core main directory.
 echo Press any key to panel . . .
 pause>nul
 goto panel)
 echo.
 echo.
+color 0c
 echo Process finalized with errors.
 echo Press any key to panel . . .
 pause>nul
 goto panel
 :3_extract_mmaps
-md mmaps
+if not exist mmaps (
+md mmaps)
 movements_extractor.exe
-if %ERRORLEVEL% == 0 (cls
 echo.
-echo.
-echo Process done!
-echo Copy mmaps folder to the core main directory.
-echo Press any key to panel . . .
-pause>nul
-goto panel)
-echo.
-echo.
-echo Process finalized with errors.
 echo Press any key to panel . . .
 pause>nul
 goto panel
