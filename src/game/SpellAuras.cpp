@@ -2438,8 +2438,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     if (uint64 guid = caster->m_SummonSlot[4])
                     {
                         if (Creature* totem = caster->GetMap()->GetCreature(guid))
-                        if (totem->isTotem())
-                            caster->ToPlayer()->CastSpell(totem, 6277, true);
+                            if (totem->isTotem())
+                                caster->ToPlayer()->CastSpell(totem, 6277, true);
                     }
                 }
                 else
@@ -2769,6 +2769,11 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 break;
         }
     }
+
+    // Cat form now automatically aplies Tracking Humanoids if no resources are up
+    if (form == FORM_CAT)
+           if (apply && m_target->HasSpell(5225) && !(m_target->GetUInt32Value(PLAYER_TRACK_CREATURES)) && !(m_target->GetUInt32Value(PLAYER_TRACK_RESOURCES)))
+                   m_target->CastCustomSpell(m_target, 5225, NULL, NULL, NULL, true);
 
     // adding/removing linked auras
     // add/remove the shapeshift aura's boosts
