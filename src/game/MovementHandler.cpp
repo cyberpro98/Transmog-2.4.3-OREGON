@@ -16,6 +16,7 @@
 #include "BattleGround.h"
 #include "WaypointMovementGenerator.h"
 #include "InstanceSaveMgr.h"
+#include "AccountMgr.h"
 #include "Language.h"
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recv_data*/)
@@ -236,7 +237,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
 {
     uint32 timediff = getMSTime();
 
-    Unit* mover = _player->m_mover;
+    Unit *mover = _player->m_mover;
 
     ASSERT(mover != NULL);                                  // there must always be a mover
 
@@ -276,9 +277,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
 
     if (!movementInfo.HasMovementFlag(MOVEFLAG_MOVING) && !mover->HasUnitMovementFlag(MOVEFLAG_MOVING) && !(opcode == MSG_MOVE_FALL_LAND))
     {
-        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outDetail("Update Orientation Only");
-        #endif
+        if (World::GetMvAnticheatDebug())
+            sLog.outDetail("Update Orientation Only");
+
         skipAnticheat = true;
         updateOrientationOnly = true;
     }
@@ -323,38 +324,35 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 }
             }
 
-            GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
+            GameObject* obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
             if (obj)
                 plMover->m_anti_transportGUID = obj->GetDBTableGUIDLow();
             else
                 plMover->m_anti_transportGUID = GUID_LOPART(movementInfo.t_guid);
 
-            #ifdef MOVEMENT_ANTICHEAT_DEBUG
-            sLog.outDetail("On Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
-            #endif
+            if (World::GetMvAnticheatDebug())
+                sLog.outDetail("On Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
         }
     }
     else if (plMover && plMover->m_transport)               // if we were on a transport, leave
     {
-        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outDetail("Left the Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
-        #endif
+        if (World::GetMvAnticheatDebug())
+            sLog.outDetail("Left the Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
 
         plMover->m_transport->RemovePassenger(plMover);
         plMover->m_transport = NULL;
         plMover->m_anti_transportGUID = 0;
         movementInfo.ClearTransportData();
     }
-
     else if (plMover && plMover->m_anti_transportGUID != 0)
     {
-        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outDetail("No more Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
-        #endif
+        if (World::GetMvAnticheatDebug())
+            sLog.outDetail("No more Transport %d", plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
+
         plMover->m_anti_transportGUID = 0;
     }
 
-    if (plMover && World::GetEnableMvAnticheat() && GetPlayer()->GetSession()->GetSecurity() <= World::GetMvAnticheatGmLevel())
+    if (plMover)
     {
         // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
         if (opcode == MSG_MOVE_FALL_LAND && !plMover->isInFlight())
@@ -394,10 +392,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
         }
         /*----------------------*/
 
-        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-        sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f, %f, %fo(%f) [%X][%s]| transport: %f, %f, %fo(%f)", plMover->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags(), LookupOpcodeName(opcode), movementInfo.GetTransportPos()->GetPositionX(), movementInfo.GetTransportPos()->GetPositionY(), movementInfo.GetTransportPos()->GetPositionZ(), movementInfo.GetTransportPos()->GetOrientation());
-        sLog.outBasic("Transport: %d |  tguid: %d - %d", plMover->m_anti_transportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
-        #endif
+        /*if (World::GetMvAnticheatDebug())
+        {
+            sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f, %f, %fo(%f) [%X][%s]| transport: %f, %f, %fo(%f)", plMover->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags(), LookupOpcodeName(opcode), movementInfo.GetTransportPos()->GetPositionX(), movementInfo.GetTransportPos()->GetPositionY(), movementInfo.GetTransportPos()->GetPositionZ(), movementInfo.GetTransportPos()->GetOrientation());
+            sLog.outBasic("Transport: %d |  tguid: %d - %d", plMover->m_anti_transportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
+        }*/
 
         //---- anti-cheat features -->>>
         if (!plMover->IsInWater() && updateOrientationOnly && plMover->m_anti_transportGUID == 0)
@@ -406,17 +405,20 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 (abs(plMover->GetPositionY() - movementInfo.GetPos()->GetPositionY()) > 0.1f) ||
                 (abs(plMover->GetPositionZ() - movementInfo.GetPos()->GetPositionZ()) > 0.1f))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Passiv Movement: dx=%f, dy=%f, dz=%f",
-                    abs(plMover->GetPositionX() - movementInfo.GetPos()->GetPositionX()),
-                    abs(plMover->GetPositionY() - movementInfo.GetPos()->GetPositionY()),
-                    abs(plMover->GetPositionZ() - movementInfo.GetPos()->GetPositionZ()));
-                #endif
+                if (World::GetMvAnticheatDebug())
+                {
+                    sLog.outError("Passiv Movement: dx=%f, dy=%f, dz=%f",
+                        abs(plMover->GetPositionX() - movementInfo.GetPos()->GetPositionX()),
+                        abs(plMover->GetPositionY() - movementInfo.GetPos()->GetPositionY()),
+                        abs(plMover->GetPositionZ() - movementInfo.GetPos()->GetPositionZ()));
+                }
                 plMover->m_anti_lastcheat = "Passiv Movement Hack";
                 check_passed = false;
             }
         }
 
+        //uint32 curDest = plMover->m_taxi.GetTaxiDestination(); // check taxi flight
+        //if ((plMover->m_anti_transportGUID == 0) && !curDest)
         if ((plMover->m_anti_transportGUID == 0) && !plMover->m_anti_ontaxipath && !skipAnticheat)
         {
             UnitMoveType move_type;
@@ -469,12 +471,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                         && (!plMover->m_anti_justteleported)
                         && !(movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) || movementInfo.HasMovementFlag(MOVEFLAG_FLYING)
                             || movementInfo.HasMovementFlag(MOVEFLAG_FLYING2))
+                        && !(plMover->isInCombat() && plMover->m_anti_last_vspeed > -2)
                         && (JumpHeight < GetPlayer()->m_anti_last_vspeed))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is GraviJump exception. anti_jumpbase=%f, anti_justjumped=%u, JumpHeight=%f, last_vspeed=%f",
-                    plMover->GetName(), plMover->m_anti_jumpbase, plMover->m_anti_justjumped, JumpHeight, plMover->m_anti_last_vspeed);
-                #endif
+                if (World::GetMvAnticheatDebug())
+                {
+                    sLog.outError("Movement Anticheat: %s is GraviJump exception. anti_jumpbase=%f, anti_justjumped=%u, JumpHeight=%f, last_vspeed=%f",
+                        plMover->GetName(), plMover->m_anti_jumpbase, plMover->m_anti_justjumped, JumpHeight, plMover->m_anti_last_vspeed);
+                }
                 plMover->m_anti_lastcheat = "GraviJump Hack";
                 check_passed = false;
             }
@@ -489,9 +493,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 }
                 else
                 {
-                    #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                    sLog.outError("Movement Anticheat: %s is Jumphack exception. count=%u",plMover->GetName(), plMover->m_anti_justjumped);
-                    #endif
+                    if (World::GetMvAnticheatDebug())
+                        sLog.outError("Movement Anticheat: %s is Jumphack exception. count=%u",plMover->GetName(), plMover->m_anti_justjumped);
+
                     plMover->m_anti_justjumped = 0;
                     plMover->m_anti_lastcheat = "Jump Hack";
                     check_passed = false; //don't process new jump packet
@@ -501,23 +505,30 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 plMover->m_anti_justjumped = 0;
 
             // Anti-Speedhack
-            // Disabled to revert: if ((real_delta > allowed_delta) && (delta_z < (plMover->m_anti_last_vspeed * time_delta) || delta_z < 1))
-            if ((real_delta > allowed_delta) && (delta_z < 1))
+            // Disabled to revert: if ((real_delta > allowed_delta) && (allowed_delta > 4) && (delta_z < (plMover->m_anti_last_vspeed * time_delta) || delta_z < 1) && !(plMover->isInCombat()))
+            if ((real_delta > allowed_delta)
+                 && (allowed_delta > 4)
+                 && (delta_z < 1) && !(plMover->isInCombat()))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is speed exception. real_delta=%f, allowed_delta=%f, delta_z=%f, last_vspeed=%f", plMover->GetName(), real_delta, allowed_delta, delta_z, plMover->m_anti_last_vspeed * time_delta);
-                #endif
-                plMover->m_anti_lastcheat = "Speed Hack";
-                check_passed = false;
+                if (plMover->m_anti_speedchanged)
+                    GetPlayer()->m_anti_speedchanged = false;
+                else
+                {
+                    if (World::GetMvAnticheatDebug())
+                        sLog.outError("Movement Anticheat: %s is speed exception. real_delta=%f, allowed_delta=%f, delta_z=%f, last_vspeed=%f", plMover->GetName(), real_delta, allowed_delta, delta_z, plMover->m_anti_last_vspeed * time_delta);
+
+                    plMover->m_anti_lastcheat = "Speed Hack";
+                    check_passed = false;
+                }
             }
 
             // Anti-Teleport
             // Disabled to revert: if ((real_delta > allowed_delta) && (real_delta > (time_delta * 100)))
             if ((real_delta > 4900.0f) && !(real_delta < allowed_delta))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is teleport exception. real_delta=%f, allowed_delta=%f, min_delta=%f ", plMover->GetName(), real_delta, allowed_delta, time_delta * 100);
-                #endif
+                if (World::GetMvAnticheatDebug())
+                    sLog.outError("Movement Anticheat: %s is teleport exception. real_delta=%f, allowed_delta=%f, min_delta=%f ", plMover->GetName(), real_delta, allowed_delta, time_delta * 100);
+
                 plMover->m_anti_lastcheat = "Teleport Hack";
                 check_passed = false;
             }
@@ -532,25 +543,26 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
             // Anti-Wallhack
             // Known issues: jump+up, and walking up with low delta_z (one and only way to make it right is to calculate the delta_z of the terrain)
             // Disabled to revert: if (!plMover->m_anti_isjumping && (tg_z > 1.6f) && (delta_z < (plMover->m_anti_last_vspeed * time_delta)))
-            if (!plMover->m_anti_isjumping && (tg_z > 1.56f) && (delta_z < plMover->m_anti_last_vspeed))
+            if (!plMover->m_anti_isjumping && (tg_z > 1.56f) && (delta_z < plMover->m_anti_last_vspeed) && !(plMover->isInCombat()))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is a wall-climb cheater. tg_z=%f, delta_z=%f, last_vspeed=%f", plMover->GetName(), tg_z, delta_z, plMover->m_anti_last_vspeed * time_delta);
-                #endif
+                if (World::GetMvAnticheatDebug())
+                    sLog.outError("Movement Anticheat: %s is a wall-climb cheater. tg_z=%f, delta_z=%f, last_vspeed=%f", plMover->GetName(), tg_z, delta_z, plMover->m_anti_last_vspeed * time_delta);
+
                 plMover->m_anti_lastcheat = "Wall-climbing Hack";
                 check_passed = false;
             }
 
             // Anti-Flyhack
-            if (((movementInfo.GetMovementFlags() & (MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_FLYING2)) != 0) && !plMover->IsInWater() && !(plMover->HasAuraType(SPELL_AURA_FLY) || plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED)))
+            if (((movementInfo.GetMovementFlags() & (MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_FLYING2)) != 0) && !(movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING)) && !(plMover->HasAuraType(SPELL_AURA_FLY) || plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED)))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is a fly cheater. {SPELL_AURA_FLY=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_STACKING=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING=[%X]}",
-                   plMover->GetName(),
-                   plMover->HasAuraType(SPELL_AURA_FLY), plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED),
-                   plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_STACKING), plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING),
-                   plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING));
-                #endif
+                if (World::GetMvAnticheatDebug())
+                {
+                    sLog.outError("Movement Anticheat: %s is a fly cheater. {SPELL_AURA_FLY=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_STACKING=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING=[%X]}",
+                        plMover->GetName(),
+                        plMover->HasAuraType(SPELL_AURA_FLY), plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED),
+                        plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_STACKING), plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING),
+                        plMover->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING));
+                }
                 plMover->m_anti_lastcheat = "Fly Hack";
                 useFallingFlag = true;
                 check_passed = false;
@@ -559,9 +571,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
             // Anti-Waterwalk
             if (movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING) && !(plMover->HasAuraType(SPELL_AURA_WATER_WALK) | plMover->HasAuraType(SPELL_AURA_GHOST)))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is a water-walk cheater. MovementFlags=[%X], SPELL_AURA_WATER_WALK=[%X]", plMover->GetName(), movementInfo.GetMovementFlags(), plMover->HasAuraType(SPELL_AURA_WATER_WALK));
-                #endif
+                if (World::GetMvAnticheatDebug())
+                    sLog.outError("Movement Anticheat: %s is a water-walk cheater. MovementFlags=[%X], SPELL_AURA_WATER_WALK=[%X]", plMover->GetName(), movementInfo.GetMovementFlags(), plMover->HasAuraType(SPELL_AURA_WATER_WALK));
+
                 plMover->m_anti_lastcheat = "Water Walk Hack";
                 check_passed = false;
             }
@@ -569,9 +581,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
             // Anti-Featherfall
             if (movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL) && !(plMover->HasAuraType(SPELL_AURA_FEATHER_FALL)))
             {
-                #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                sLog.outError("Movement Anticheat: %s is a featherfall-fall cheater. MovementFlags=[%X], SPELL_AURA_FEATHER_FALL=[%X]", plMover->GetName(), movementInfo.GetMovementFlags(), plMover->HasAuraType(SPELL_AURA_FEATHER_FALL));
-                #endif
+                if (World::GetMvAnticheatDebug())
+                    sLog.outError("Movement Anticheat: %s is a featherfall-fall cheater. MovementFlags=[%X], SPELL_AURA_FEATHER_FALL=[%X]", plMover->GetName(), movementInfo.GetMovementFlags(), plMover->HasAuraType(SPELL_AURA_FEATHER_FALL));
+
                 plMover->m_anti_lastcheat = "Feather Fall Hack";
                 check_passed = false;
             }
@@ -587,13 +599,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                     plane_z = (plane_z < -500.0f) ? 0 : plane_z; // check holes in height map
                     if (plane_z > 0.1f || plane_z < -0.1f)
                     {
-                        #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                        sLog.outError("Movement Anticheat: %s uses teleport to plane. plane_z: %f ", plMover->GetName(), plane_z);
-                        #endif
+                        if (World::GetMvAnticheatDebug())
+                            sLog.outError("Movement Anticheat: %s uses teleport to plane. plane_z: %f ", plMover->GetName(), plane_z);
+
                         plMover->m_anti_lastcheat = "Teleport to Plane Hack";
                         check_passed = false;
-                        plMover->GetSession()->KickPlayer();
-                        sWorld.SendGMText(LANG_GM_AC_KICK_ANNOUNCE, plMover->GetName());
                     }
                 }
             }
@@ -611,9 +621,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
             {
                 if (GameObjectData const* go_data = objmgr.GetGOData(plMover->m_anti_transportGUID))
                 {
-                    #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                    sLog.outError("Movement Anticheat: %s on some transport. xyz: %f, %f, %f", plMover->GetName(), go_data->posX, go_data->posY, go_data->posZ);
-                    #endif
+                    if (World::GetMvAnticheatDebug())
+                        sLog.outError("Movement Anticheat: %s on some transport. xyz: %f, %f, %f", plMover->GetName(), go_data->posX, go_data->posY, go_data->posZ);
 
                     int mapid = go_data->mapid;
                     if (plMover->GetMapId() != mapid)
@@ -631,9 +640,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 }
                 else
                 {
-                    #ifdef MOVEMENT_ANTICHEAT_DEBUG
-                    sLog.outError("Movement Anticheat: %s on undefined transport.", plMover->GetName());
-                    #endif
+                    if (World::GetMvAnticheatDebug())
+                        sLog.outError("Movement Anticheat: %s on undefined transport.", plMover->GetName());
+
                     check_passed = false;
                 }
             }
@@ -650,11 +659,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
                 plMover->m_anti_transportGUID = 0;
             }
         }
-    }
 
-    if (plMover)                                            // nothing is charmed, or player charmed
-    {
-        if (check_passed || forcemovement)
+        if (check_passed ||
+            forcemovement ||
+            !World::GetEnableMvAnticheat() ||
+            GetPlayer()->GetSession()->GetSecurity() > World::GetMvAnticheatGmLevel())
         {
             /* process position-change */
             recv_data.put<uint32>(5, getMSTime());                  // offset flags(4) + unk(1)
@@ -677,17 +686,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
 
             if (movementInfo.GetPos()->GetPositionZ() < -500.0f)
                 plMover->HandleFallUnderMap();
-
-            if (plMover->m_anti_alarmcount > 0)
-            {
-                sWorld.SendGMText(LANG_GM_AC_ANNOUNCE, plMover->GetName(), plMover->m_anti_lastcheat.c_str());
-            }
-
-            plMover->m_anti_alarmcount = 0;
         }
         else
         {
-            plMover->m_anti_alarmcount++;
             WorldPacket data;
             // Temporary disabled maybee cause fall dmg on dismount in air
             /* if (useFallingFlag)
@@ -700,6 +701,25 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
             plMover->GetSession()->SendPacket(&data);
             plMover->BuildHeartBeatMsg(&data);
             plMover->SendMessageToSet(&data, true);
+
+            switch (World::GetMvAnticheatAction())
+            {
+            case 0:
+                sWorld.SendGMText(LANG_GM_AC_ANNOUNCE, plMover->GetName(), plMover->m_anti_lastcheat.c_str());
+                break;
+            case 1:
+                plMover->GetSession()->KickPlayer();
+                sWorld.SendGMText(LANG_GM_AC_KICK_ANNOUNCE, plMover->GetName(), plMover->m_anti_lastcheat.c_str());
+                break;
+            case 2:
+                std::string accountName;
+                AccountMgr::GetName(plMover->GetSession()->GetAccountId(), accountName);
+                std::stringstream duration;
+                duration << World::GetMvAnticheatBanDuration() << "s";
+                sWorld.BanAccount(BAN_ACCOUNT, accountName, duration.str(), plMover->m_anti_lastcheat.c_str(),"AC");
+                sWorld.SendGMText(LANG_GM_AC_BAN_ANNOUNCE, plMover->GetName(), plMover->m_anti_lastcheat.c_str());
+                break;
+            }
         }
     }
     else
@@ -709,6 +729,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recv_data)
 {
+    GetPlayer()->m_anti_speedchanged = true;
     DEBUG_LOG("WORLD: Recvd CMSG_SPEED_CHANGE_ACK");
     /* extract packet */
     ObjectGuid guid;
@@ -729,10 +750,11 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recv_data)
     // Save movement flags
     GetPlayer()->SetUnitMovementFlags(movementInfo.GetMovementFlags());
 
-    #ifdef MOVEMENT_ANTICHEAT_DEBUG
-    sLog.outBasic("%s CMSG_SPEED_CHANGE_ACK: tm:%d ftm:%d | %f, %f, %fo(%f) [%X]", GetPlayer()->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags());
-    sLog.outBasic("%s CMSG_SPEED_CHANGE_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f", GetPlayer()->GetName(), movementInfo.j_velocity, movementInfo.j_xyspeed, movementInfo.j_sinAngle, movementInfo.j_cosAngle);
-    #endif
+    if (World::GetMvAnticheatDebug())
+    {
+        sLog.outBasic("%s CMSG_SPEED_CHANGE_ACK: tm:%d ftm:%d | %f, %f, %fo(%f) [%X]", GetPlayer()->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags());
+        sLog.outBasic("%s CMSG_SPEED_CHANGE_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f", GetPlayer()->GetName(), movementInfo.j_velocity, movementInfo.j_xyspeed, movementInfo.j_sinAngle, movementInfo.j_cosAngle);
+    }
 
     // skip not personal message;
     GetPlayer()->m_movementInfo = movementInfo;
@@ -841,10 +863,11 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
     GetPlayer()->m_anti_isknockedback = true;
     //Todo: Store the final Position and check it with the Position of MSG_MOVE_FALL_LAND in HandleMovementOpcodes
 
-    #ifdef MOVEMENT_ANTICHEAT_DEBUG
-    sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK: tm:%d ftm:%d | %f, %f, %fo(%f) [%X]", GetPlayer()->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags());
-    sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f", GetPlayer()->GetName(), movementInfo.j_velocity, movementInfo.j_xyspeed, movementInfo.j_sinAngle, movementInfo.j_cosAngle);
-    #endif
+    if (World::GetMvAnticheatDebug())
+    {
+        sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK: tm:%d ftm:%d | %f, %f, %fo(%f) [%X]", GetPlayer()->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags());
+        sLog.outBasic("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f", GetPlayer()->GetName(), movementInfo.j_velocity, movementInfo.j_xyspeed, movementInfo.j_sinAngle, movementInfo.j_cosAngle);
+    }
 
     // skip not personal message;
     GetPlayer()->m_movementInfo = movementInfo;

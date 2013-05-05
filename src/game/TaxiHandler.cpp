@@ -193,6 +193,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
     // 1) end taxi path in far (multi-node) flight
     // 2) switch from one map to other in case multim-map taxi path
     // we need process only (1)
+
     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
     if (!curDest)
     {
@@ -202,7 +203,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& recv_data)
         GetPlayer()->m_anti_lastmovetime = movementInfo.time;
         GetPlayer()->m_anti_justteleported = true;
         //<<< end Movement Anticheat
-         return;
+        return;
     }
 
     TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);

@@ -9,7 +9,8 @@ REPLACE INTO `command` (`name`, `security`, `help`) VALUES
 ('msgguard', 1, 'Syntax: .msg $announcement.\nSend an announcement to all online players, displaying the name of the sender.');
 
 -- Add AntiCheat.
-INSERT INTO `blizzlike_string` VALUES (6620,'|cfff00000%s is kicked for use Teleport to Plane Hack.|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(6621,'|cfff00000%s produces a anticheat alarm for %s.|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+DELETE FROM `blizzlike_string` WHERE `entry` IN (6620,6621,6622);
+INSERT INTO `blizzlike_string` VALUES (6620,'|cfff00000%s was detected using: %s.|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(6621,'|cfff00000%s was kicked using: %s.|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(6622,'|cfff00000%s was banned using: %s.|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 
 -- Add Transmogrification.
 DELETE FROM `creature_template` WHERE `entry` = 91011;

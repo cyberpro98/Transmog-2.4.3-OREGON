@@ -371,21 +371,20 @@ Player::Player (WorldSession *session): Unit()
     ////////////////////Rest System/////////////////////
 
     // Movement Anticheat
-    m_anti_lastmovetime = 0;          //last movement time
-    m_anti_transportGUID = 0;         //current transport GUID
-    m_anti_last_hspeed = 7.0f;        //horizontal speed, default RUN speed
-    m_anti_lastspeed_changetime = 0;  //last speed change time
-    m_anti_last_vspeed = -2.3f;       //vertical speed, default max jump height
-    m_anti_beginfalltime = 0;         //alternative falling begin time
-    m_anti_justteleported = false;    //seted when player was teleported
-    m_anti_alarmcount = 0;            //alarm counter
+    m_anti_lastmovetime = 0;          // last movement time
+    m_anti_transportGUID = 0;         // current transport GUID
+    m_anti_last_hspeed = 7.0f;        // horizontal speed, default RUN speed
+    m_anti_lastspeed_changetime = 0;  // last speed change time
+    m_anti_last_vspeed = -2.3f;       // vertical speed, default max jump height
+    m_anti_beginfalltime = 0;         // alternative falling begin time
+    m_anti_justteleported = false;    // seted when player was teleported
     m_anti_flymounted = false;        // seted when player is mounted on flymount
     m_anti_wasflymounted = false;     // seted when player was mounted on flymount
     m_anti_ontaxipath = false;        // seted when player is on a taxi fight
     m_anti_isjumping = false;         // seted when player is in jump phase
     m_anti_isknockedback = false;     // seted when player is knocked back
+    m_anti_speedchanged = false;      // seted when player changed speed
     m_anti_justjumped = 0;            // jump already began, anti-air jump check
-    m_anti_alarmcount = 0;            // alarm counter
     m_anti_lastcheat.empty();         // stores last cheat as string
     m_anti_jumpbase = 0;              // Anti-Gravitation
 
@@ -20557,7 +20556,7 @@ void Player::HandleFallDamage(MovementInfo& movementInfo)
     // Removed for Anticheat Fall DMG
     if (!World::GetEnableMvAnticheat() && movementInfo.GetFallTime() < 1500)
         return;
-     else
+    else
         if (movementInfo.GetFallTime() > 400 && movementInfo.GetFallTime() < 1500) // lower falltime then 400 = cheat
             return;
 
