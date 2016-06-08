@@ -124,7 +124,7 @@ int Master::Run()
         return 1;
 
     // set server offline (not connectable)
-    LoginDatabase.PExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
+	LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);
 
     // Initialize the World
     sWorld.SetInitialWorldSettings();
@@ -139,7 +139,7 @@ int Master::Run()
     // set realmbuilds depend on worldserver expected builds, and set server online
     //std::string builds = AcceptableClientBuildsListStr();
     //LoginDatabase.escape_string(builds);
-    LoginDatabase.PExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_INVALID, realmID);
+	LoginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE active_realm_id = '%d'", realmID);
 
     ACE_Based::Thread* cliThread = NULL;
 
@@ -433,7 +433,7 @@ void Master::clearOnlineAccounts()
     /// LoginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE active_realm_id = '%d'", realmID);
 
     // Reset online status for all accounts with characters on the current realm
-    LoginDatabase.PExecute("UPDATE account SET online = 0 WHERE online > 0 AND id IN (SELECT acctid FROM realmcharacters WHERE realmid = %d)", realmID);
+	//LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%d'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
 
     // Reset online status for all characters
     CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online <> 0");
